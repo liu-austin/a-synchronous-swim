@@ -1,6 +1,6 @@
 const _ = require('underscore');
 const keypress = require('keypress');
-
+const messages = require('./messageQueue.js');
 ///////////////////////////////////////////////////////////////////////////////
 // Utility Function ///////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////
@@ -26,7 +26,7 @@ const logKeypress = (key) => {
 
 var message = ''; // a buffer to collect key presses
 
-module.exports.initialize = (callback) => {
+module.exports.initialize = () => {
 
   // setup an event handler on standard input
   process.stdin.on('keypress', (chunk, key) => {
@@ -37,22 +37,25 @@ module.exports.initialize = (callback) => {
 
     // check to see if the keypress itself is a valid message
     if (isValidMessage(key.name)) {
-      callback(key.name);
+      messages.enqueue(key.name);
       return; // don't do any more processing on this key
     }
-    
+
     // otherwise build up a message from individual characters
     if (key && (key.name === 'return' || key.name === 'enter')) {
       // on enter, process the message
       logKeypress('\n');
       if (message.length > 0) {
-        callback(message);
+        console.log(message);
         message = ''; // clear the buffer where we are collecting keystrokes
       }
     } else {
       // collect the individual characters/keystrokes
       message += (mappedChars[key.name] || key.name);
       logKeypress(key.name);
+      if (isValidMessage(message)) {
+        messages.enqueue(message);
+      }
     }
 
   });

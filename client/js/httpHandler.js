@@ -5,7 +5,22 @@
   //
   // TODO: build the swim command fetcher here
   //
+  const swimCommandFetcher= () => {
+    // var formData = new FormData();
+    // formData.append('file', file);
+    $.get({url: serverUrl,  // url
+      success: function (data) {  // success callback
+        console.log('testing success');
+        SwimTeam.move(data);
+      },
+      complete: function () {
+        console.log('success');
+        setInterval(swimCommandFetcher, 2000);
+      }
+    });
 
+  };
+  swimCommandFetcher();
   /////////////////////////////////////////////////////////////////////
   // The ajax file uplaoder is provided for your convenience!
   // Note: remember to fix the URL below.
@@ -17,13 +32,14 @@
     $.ajax({
       type: 'POST',
       data: formData,
-      url: 'FILL_ME_IN',
+      url: serverUrl,
       cache: false,
       contentType: false,
       processData: false,
       success: () => {
         // reload the page
         window.location = window.location.href;
+        retrieveBackgroundImage('./spec/' + file.name);
       }
     });
   };
@@ -46,4 +62,17 @@
     ajaxFileUplaod(file);
   });
 
+  const retrieveBackgroundImage = (fileName) => {
+    $.get({url: serverUrl + '/' + fileName,  // url
+      success: function (data) {  // success callback
+        console.log('testing success');
+        $('body').css('background-image', 'url(' + fileName + ')');
+      },
+      complete: function () {
+        console.log('success');
+      }
+    });
+  };
+
 })();
+
